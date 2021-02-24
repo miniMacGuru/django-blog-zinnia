@@ -31,7 +31,8 @@ setup(
     license=zinnia.__license__,
     include_package_data=True,
     zip_safe=False,
-    install_requires=['beautifulsoup4>=4.3.2',
+    install_requires=['Django>=3.1'
+                      'beautifulsoup4>=4.3.2',
                       'django-contrib-comments>=1.7.2',
                       'django-mptt>=0.8.6',
                       'django-tagging>=0.4.5',
