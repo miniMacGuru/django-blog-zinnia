@@ -1,12 +1,16 @@
-0.20.2
-------
+0.21.0 - 2021/02/25
+-------------------
 
-* TODO: Migrate urls from "url" to "path";
+* Drop support for Django<3.1;
+* Migrated urls from "url()" to "path()" with pattern converters;
+* Use 'force_str()' instead of deprecated 'force_text()';
+* Remove 'providing_args' argument in Signals;
 
-0.20.1
-------
 
-* Some fixes for Django>=3.0;
+0.20.1 - 2021/02/23
+-------------------
+
+* Some fixes for Django>=3.0 support;
 
 0.20
 ----
