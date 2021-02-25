@@ -40,7 +40,7 @@ class UsernamePathConverter:
     """
     Pattern converter for Author username string
     """
-    regex = '[a-zA-Z0-9_.+-@]+'
+    regex = r'[a-zA-Z0-9_.+-@]+'
 
     def to_python(self, value):
         return value
@@ -53,7 +53,7 @@ class PathPathConverter:
     """
     Pattern converter for path string (such as ``foo/bar``)
     """
-    regex = '[-\/\w]+'
+    regex = r'[-\/\w]+'
 
     def to_python(self, value):
         return value
@@ -79,7 +79,7 @@ class TokenPathConverter:
     """
     Pattern converter for token string
     """
-    regex = '[\dA-Z]+'
+    regex = r'[\dA-Z]+'
 
     def to_python(self, value):
         return value
