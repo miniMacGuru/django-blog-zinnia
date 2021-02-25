@@ -11,6 +11,7 @@ setup(
     description='A clear and powerful weblog application powered with Django',
     long_description='\n'.join([open('README.rst').read(),
                                 open('CHANGELOG').read()]),
+    long_description_content_type='text/x-rst',
     keywords='django, blog, weblog, zinnia, post, news',
 
     author=zinnia.__author__,
