@@ -1,11 +1,11 @@
 """Test urls for the zinnia project"""
 from django.conf.urls import url
 
-from zinnia.views.tags import TagDetail
-from zinnia.views.authors import AuthorDetail
-from zinnia.views.categories import CategoryDetail
 from zinnia.tests.implementations.urls.default import (
     urlpatterns as test_urlpatterns)
+from zinnia.views.authors import AuthorDetail
+from zinnia.views.categories import CategoryDetail
+from zinnia.views.tags import TagDetail
 
 
 class CustomModelDetailMixin(object):
@@ -47,10 +47,10 @@ urlpatterns = [
     url(r'^categories/(?P<path>[-\/\w]+)/$',
         CustomCategoryDetail.as_view(),
         name='zinnia_category_detail'),
-    url(r'^tags/(?P<tag>[^/]+(?u))/$',
+    url(r'^tags/(?P<tag>[^/]+)/$',
         CustomTagDetail.as_view(),
         name='zinnia_tag_detail'),
-    url(r'^tags/(?P<tag>[^/]+(?u))/page/(?P<page>\d+)/$',
+    url(r'^tags/(?P<tag>[^/]+)/page/(?P<page>\d+)/$',
         CustomTagDetail.as_view(),
         name='zinnia_tag_detail_paginated'),
 ] + test_urlpatterns

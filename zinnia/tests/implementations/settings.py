@@ -1,6 +1,4 @@
 """Settings for testing zinnia"""
-from zinnia.xmlrpc import ZINNIA_XMLRPC_METHODS
-
 SITE_ID = 1
 
 USE_TZ = True
@@ -15,10 +13,9 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.SHA1PasswordHasher'
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware'
 ]
 
 TEMPLATES = [
@@ -55,5 +52,3 @@ INSTALLED_APPS = [
 ]
 
 ZINNIA_PAGINATION = 3
-
-XMLRPC_METHODS = ZINNIA_XMLRPC_METHODS

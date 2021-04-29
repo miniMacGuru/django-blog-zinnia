@@ -1,41 +1,36 @@
 """Test cases for Zinnia's PingBack API"""
-try:
-    from urllib.error import HTTPError
-    from urllib.parse import urlsplit
-    from xmlrpc.client import ServerProxy
-except ImportError:  # Python 2
-    from urllib2 import HTTPError
-    from urlparse import urlsplit
-    from xmlrpclib import ServerProxy
-
-from django.utils import six
-from django.utils import timezone
-from django.test import TestCase
-from django.contrib.sites.models import Site
-from django.test.utils import override_settings
-from django.contrib.contenttypes.models import ContentType
-
-import django_comments as comments
+from io import BytesIO
+from urllib.error import HTTPError
+from urllib.parse import urlsplit
+from xmlrpc.client import ServerProxy
 
 from bs4 import BeautifulSoup
 
-from zinnia.models.entry import Entry
-from zinnia.models.author import Author
-from zinnia.models.category import Category
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils import timezone
+
+import django_comments as comments
+
+from zinnia import url_shortener as shortener_settings
 from zinnia.flags import PINGBACK
 from zinnia.flags import get_user_flagger
 from zinnia.managers import PUBLISHED
-from zinnia.tests.utils import datetime
-from zinnia.tests.utils import TestTransport
-from zinnia.tests.utils import skipIfCustomUser
-from zinnia.xmlrpc.pingback import generate_pingback_content
-from zinnia import url_shortener as shortener_settings
+from zinnia.models.author import Author
+from zinnia.models.category import Category
+from zinnia.models.entry import Entry
 from zinnia.signals import connect_discussion_signals
-from zinnia.signals import disconnect_entry_signals
 from zinnia.signals import disconnect_discussion_signals
+from zinnia.signals import disconnect_entry_signals
+from zinnia.tests.utils import TestTransport
+from zinnia.tests.utils import datetime
+from zinnia.tests.utils import skip_if_custom_user
+from zinnia.xmlrpc.pingback import generate_pingback_content
 
 
-@skipIfCustomUser
+@skip_if_custom_user
 @override_settings(
     ROOT_URLCONF='zinnia.tests.implementations.urls.default',
     TEMPLATES=[
@@ -59,7 +54,7 @@ class PingBackTestCase(TestCase):
         if not netloc:
             raise
         if self.site.domain == netloc:
-            response = six.BytesIO(self.client.get(url).content)
+            response = BytesIO(self.client.get(url).content)
             return response
         raise HTTPError(url, 404, 'unavailable url', {}, None)
 
@@ -76,6 +71,10 @@ class PingBackTestCase(TestCase):
         import zinnia.xmlrpc.pingback
         self.original_urlopen = zinnia.xmlrpc.pingback.urlopen
         zinnia.xmlrpc.pingback.urlopen = self.fake_urlopen
+        # Set up a stub around zinnia.spam_checker
+        import zinnia.spam_checker
+        self.original_scb = zinnia.spam_checker.SPAM_CHECKER_BACKENDS
+        zinnia.spam_checker.SPAM_CHECKER_BACKENDS = []
         # Preparing site
         self.site = Site.objects.get_current()
         # Creating tests entries
@@ -115,6 +114,8 @@ class PingBackTestCase(TestCase):
         import zinnia.xmlrpc.pingback
         zinnia.xmlrpc.pingback.urlopen = self.original_urlopen
         shortener_settings.URL_SHORTENER_BACKEND = self.original_shortener
+        import zinnia.spam_checker
+        zinnia.spam_checker.SPAM_CHECKER_BACKENDS = self.original_scb
 
     def test_generate_pingback_content(self):
         soup = BeautifulSoup(self.second_entry.content, 'html.parser')
@@ -215,6 +216,22 @@ class PingBackTestCase(TestCase):
         self.assertEqual(first_entry_reloaded.pingback_count, 1)
         self.assertTrue(self.second_entry.title in
                         self.first_entry.pingbacks[0].user_name)
+
+    def test_pingback_ping_spam_checker(self):
+        import zinnia.spam_checker
+        original_scb = zinnia.spam_checker.SPAM_CHECKER_BACKENDS
+        zinnia.spam_checker.SPAM_CHECKER_BACKENDS = (
+            'zinnia.spam_checker.backends.all_is_spam',
+        )
+        target = 'http://%s%s' % (
+            self.site.domain, self.first_entry.get_absolute_url())
+        source = 'http://%s%s' % (
+            self.site.domain, self.second_entry.get_absolute_url())
+        self.first_entry.pingback_enabled = True
+        self.first_entry.save()
+        response = self.server.pingback.ping(source, target)
+        self.assertEqual(response, 51)
+        zinnia.spam_checker.SPAM_CHECKER_BACKENDS = original_scb
 
     def test_pingback_extensions_get_pingbacks(self):
         target = 'http://%s%s' % (

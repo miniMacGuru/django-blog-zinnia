@@ -1,18 +1,17 @@
 """Comparison tools for Zinnia"""
 from math import sqrt
 
-from django.utils import six
-from django.core.cache import caches
-from django.utils.html import strip_tags
 from django.contrib.sites.models import Site
-from django.utils.functional import cached_property
 from django.core.cache import InvalidCacheBackendError
+from django.core.cache import caches
+from django.utils.functional import cached_property
+from django.utils.html import strip_tags
 
 import regex as re
 
 from zinnia.models.entry import Entry
-from zinnia.settings import STOP_WORDS
 from zinnia.settings import COMPARISON_FIELDS
+from zinnia.settings import STOP_WORDS
 
 
 PUNCTUATION = re.compile(r'\p{P}+')
@@ -77,9 +76,8 @@ class ModelVectorBuilder(object):
                     object_related[o_id] = score(object_vector, o_vector)
                 except ZeroDivisionError:
                     pass
-
         related = sorted(object_related.items(),
-                         key=lambda k_v: k_v[1], reverse=True)
+                         key=lambda k_v: (k_v[1], k_v[0]), reverse=True)
         return related
 
     @cached_property
@@ -95,7 +93,7 @@ class ModelVectorBuilder(object):
         for item in queryset:
             item = list(item)
             item_pk = item.pop(0)
-            datas = ' '.join(map(six.text_type, item))
+            datas = ' '.join(map(str, item))
             dataset[item_pk] = self.raw_clean(datas)
         return dataset
 

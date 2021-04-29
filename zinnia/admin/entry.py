@@ -2,26 +2,26 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.db.models import Q
-from django.utils import timezone
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import NoReverseMatch
+from django.db.models import Q
+from django.urls import NoReverseMatch
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.html import conditional_escape
 from django.utils.html import format_html
 from django.utils.html import format_html_join
-from django.utils.html import conditional_escape
-from django.utils.translation import ungettext_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from zinnia import settings
+from zinnia.admin.filters import AuthorListFilter
+from zinnia.admin.filters import CategoryListFilter
+from zinnia.admin.forms import EntryAdminForm
+from zinnia.comparison import EntryPublishedVectorBuilder
 from zinnia.managers import HIDDEN
 from zinnia.managers import PUBLISHED
 from zinnia.models.author import Author
 from zinnia.ping import DirectoryPinger
-from zinnia.admin.forms import EntryAdminForm
-from zinnia.admin.filters import AuthorListFilter
-from zinnia.admin.filters import CategoryListFilter
-from zinnia.comparison import EntryPublishedVectorBuilder
 
 
 class EntryAdmin(admin.ModelAdmin):
@@ -59,6 +59,7 @@ class EntryAdmin(admin.ModelAdmin):
     list_display = ('get_title', 'get_authors', 'get_categories',
                     'get_tags', 'get_sites', 'get_is_visible', 'featured',
                     'get_short_url', 'publication_date')
+    sortable_by = ('publication_date', 'featured')
     radio_fields = {'content_template': admin.VERTICAL,
                     'detail_template': admin.VERTICAL}
     filter_horizontal = ('categories', 'authors', 'related')
@@ -86,7 +87,7 @@ class EntryAdmin(admin.ModelAdmin):
                              entry.pingback_count +
                              entry.trackback_count)
         if reaction_count:
-            return ungettext_lazy(
+            return ngettext_lazy(
                 '%(title)s (%(reactions)i reaction)',
                 '%(title)s (%(reactions)i reactions)', reaction_count) % \
                 {'title': title,
@@ -108,7 +109,6 @@ class EntryAdmin(admin.ModelAdmin):
             return ', '.join(
                 [conditional_escape(getattr(author, author.USERNAME_FIELD))
                  for author in entry.authors.all()])
-    get_authors.allow_tags = True
     get_authors.short_description = _('author(s)')
 
     def get_categories(self, entry):
@@ -123,7 +123,6 @@ class EntryAdmin(admin.ModelAdmin):
         except NoReverseMatch:
             return ', '.join([conditional_escape(category.title)
                               for category in entry.categories.all()])
-    get_categories.allow_tags = True
     get_categories.short_description = _('category(s)')
 
     def get_tags(self, entry):
@@ -137,7 +136,6 @@ class EntryAdmin(admin.ModelAdmin):
                  for tag in entry.tags_list])
         except NoReverseMatch:
             return conditional_escape(entry.tags)
-    get_tags.allow_tags = True
     get_tags.short_description = _('tag(s)')
 
     def get_sites(self, entry):
@@ -152,7 +150,6 @@ class EntryAdmin(admin.ModelAdmin):
             ', ', '<a href="{}://{}{}" target="blank">{}</a>',
             [(settings.PROTOCOL, site.domain, index_url,
               conditional_escape(site.name)) for site in entry.sites.all()])
-    get_sites.allow_tags = True
     get_sites.short_description = _('site(s)')
 
     def get_short_url(self, entry):
@@ -165,7 +162,6 @@ class EntryAdmin(admin.ModelAdmin):
             short_url = entry.get_absolute_url()
         return format_html('<a href="{url}" target="blank">{url}</a>',
                            url=short_url)
-    get_short_url.allow_tags = True
     get_short_url.short_description = _('short url')
 
     def get_is_visible(self, entry):

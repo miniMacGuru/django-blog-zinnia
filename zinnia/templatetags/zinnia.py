@@ -1,48 +1,43 @@
 """Template tags and filters for Zinnia"""
 import re
-from hashlib import md5
 from datetime import date
-try:
-    from urllib.parse import urlencode
-except ImportError:  # Python 2
-    from urllib import urlencode
+from hashlib import md5
+from urllib.parse import urlencode
 
-from django.db.models import Q
-from django.db.models import Count
 from django.conf import settings
-from django.utils import timezone
-from django.template import Library
-from django.utils.encoding import smart_text
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
-from django.utils.html import conditional_escape
-from django.template.loader import select_template
-from django.template.defaultfilters import stringfilter
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+from django.db.models import Q
+from django.template import Library
+from django.template.defaultfilters import stringfilter
+from django.template.loader import select_template
+from django.utils import timezone
+from django.utils.encoding import smart_str
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
-from django_comments.models import CommentFlag
 from django_comments import get_model as get_comment_model
+from django_comments.models import CommentFlag
 
 from tagging.models import Tag
 from tagging.utils import calculate_cloud
 
-
-from ..models.entry import Entry
-from ..models.author import Author
-from ..models.category import Category
+from ..breadcrumbs import retrieve_breadcrumbs
+from ..calendar import Calendar
+from ..comparison import EntryPublishedVectorBuilder
+from ..context import get_context_first_matching_object
+from ..context import get_context_first_object
+from ..context import get_context_loop_positions
+from ..flags import PINGBACK, TRACKBACK
 from ..managers import DRAFT
 from ..managers import tags_published
-from ..flags import PINGBACK, TRACKBACK
-from ..settings import PROTOCOL
+from ..models.author import Author
+from ..models.category import Category
+from ..models.entry import Entry
 from ..settings import ENTRY_LOOP_TEMPLATES
-from ..comparison import EntryPublishedVectorBuilder
-from ..calendar import Calendar
-from ..breadcrumbs import retrieve_breadcrumbs
-from ..context import get_context_first_object
-from ..context import get_context_first_matching_object
-from ..context import get_context_loop_positions
-from ..templates import loop_template_list
+from ..settings import PROTOCOL
+from ..templating import loop_template_list
 
 
 WIDONT_REGEXP = re.compile(
@@ -61,7 +56,7 @@ def get_categories(context, template='zinnia/tags/categories.html'):
     Return the published categories.
     """
     return {'template': template,
-            'categories': Category.published.all().annotate(
+            'categories': Category.published.all().order_by('title').annotate(
                 count_entries_published=Count('entries')),
             'context_category': context.get('category')}
 
@@ -72,7 +67,8 @@ def get_categories_tree(context, template='zinnia/tags/categories_tree.html'):
     Return the categories as a tree.
     """
     return {'template': template,
-            'categories': Category.objects.all(),
+            'categories': Category.objects.all().annotate(
+                count_entries=Count('entries')),
             'context_category': context.get('category')}
 
 
@@ -229,8 +225,8 @@ def get_recent_comments(number=5, template='zinnia/tags/comments_recent.html'):
     """
     Return the most recent comments.
     """
-    # Using map(smart_text... fix bug related to issue #8554
-    entry_published_pks = map(smart_text,
+    # Using map(smart_str... fix bug related to issue #8554
+    entry_published_pks = map(smart_str,
                               Entry.published.values_list('id', flat=True))
     content_type = ContentType.objects.get_for_model(Entry)
 
@@ -251,7 +247,7 @@ def get_recent_linkbacks(number=5,
     """
     Return the most recent linkbacks.
     """
-    entry_published_pks = map(smart_text,
+    entry_published_pks = map(smart_str,
                               Entry.published.values_list('id', flat=True))
     content_type = ContentType.objects.get_for_model(Entry)
 
@@ -275,10 +271,10 @@ def zinnia_pagination(context, page, begin_pages=1, end_pages=1,
     Return a Digg-like pagination,
     by splitting long list of page into 3 blocks of pages.
     """
-    GET_string = ''
+    get_string = ''
     for key, value in context['request'].GET.items():
         if key != 'page':
-            GET_string += '&%s=%s' % (key, value)
+            get_string += '&%s=%s' % (key, value)
 
     page_range = list(page.paginator.page_range)
     begin = page_range[:begin_pages]
@@ -311,11 +307,11 @@ def zinnia_pagination(context, page, begin_pages=1, end_pages=1,
             'begin': begin,
             'middle': middle,
             'end': end,
-            'GET_string': GET_string}
+            'GET_string': get_string}
 
 
 @register.inclusion_tag('zinnia/tags/dummy.html', takes_context=True)
-def zinnia_breadcrumbs(context, root_name=_('Blog'),
+def zinnia_breadcrumbs(context, root_name='',
                        template='zinnia/tags/breadcrumbs.html',):
     """
     Return a breadcrumb for the application.
@@ -324,8 +320,8 @@ def zinnia_breadcrumbs(context, root_name=_('Blog'),
     context_object = get_context_first_object(
         context, ['object', 'category', 'tag', 'author'])
     context_page = context.get('page_obj')
-    breadcrumbs = retrieve_breadcrumbs(path, context_object,
-                                       context_page, root_name)
+    breadcrumbs = retrieve_breadcrumbs(
+        path, context_object, context_page, root_name)
 
     return {'template': template,
             'breadcrumbs': breadcrumbs}
@@ -356,10 +352,10 @@ def get_gravatar(email, size=80, rating='g', default=None,
     """
     Return url for a Gravatar.
     """
-    GRAVATAR_PROTOCOLS = {'http': 'http://www',
+    gravatar_protocols = {'http': 'http://www',
                           'https': 'https://secure'}
     url = '%s.gravatar.com/avatar/%s' % (
-        GRAVATAR_PROTOCOLS[protocol],
+        gravatar_protocols[protocol],
         md5(email.strip().lower().encode('utf-8')).hexdigest())
     options = {'s': size, 'r': rating}
     if default:
@@ -404,7 +400,7 @@ def widont(value, autoescape=None):
     def replace(matchobj):
         return '&nbsp;%s' % matchobj.group(1)
 
-    value = END_PUNCTUATION_WIDONT_REGEXP.sub(replace, esc(smart_text(value)))
+    value = END_PUNCTUATION_WIDONT_REGEXP.sub(replace, esc(smart_str(value)))
     value = WIDONT_REGEXP.sub(replace, value)
     value = DOUBLE_SPACE_PUNCTUATION_WIDONT_REGEXP.sub(replace, value)
 
@@ -413,7 +409,7 @@ def widont(value, autoescape=None):
 
 @register.filter
 def week_number(date):
-    """
+    r"""
     Return the Python week number of a date.
     The django \|date:"W" returns incompatible value
     with the view implementation.

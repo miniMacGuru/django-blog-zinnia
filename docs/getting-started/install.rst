@@ -11,22 +11,21 @@ Dependencies
 
 Make sure to install these packages prior to installation :
 
-* `Python`_ >= 2.7
-* `Django`_ >= 1.9,<1.10
-* `Pillow`_ >= 2.0.0
-* `django-mptt`_ >= 0.5.1
-* `django-tagging`_ >= 0.3.6
-* `beautifulsoup4`_ >= 4.1.3
-* `mots-vides`_ >= 2015.2.6
-* `regex`_ >= 2016.3.2
-* `django-contrib-comments`_ >= 1.6
+* `Python`_ >= 3.5
+* `Django`_ >= 2.2
+* `Pillow`_ >= 7.0.0
+* `django-mptt`_ >= 0.11.0
+* `django-tagging`_ >= 0.5.0
+* `beautifulsoup4`_ >= 4.8.2
+* `mots-vides`_ >= 2015.5.11
+* `pyparsing`_ >= 2.4.6
+* `regex`_ >= 2020.2.20
+* `django-contrib-comments`_ >= 1.9.2
 
 The packages below are optionnal but needed for run the full test suite or
 migrate the database.
 
-* `pytz`_
-* `pyparsing`_ >= 2.0.1
-* `django-xmlrpc`_ >= 0.1.5
+* `django-xmlrpc`_ >= 0.1.8
 
 Note that all the needed dependencies will be resolved if you install
 Zinnia with :program:`pip` or :program:`easy_install`, excepting Django.
@@ -115,6 +114,9 @@ URLs
 
 Add at least these following lines to your project's urls.py in order to
 display the Weblog. ::
+
+  from django.conf.urls import include
+  from django.conf.urls import url
 
   url(r'^weblog/', include('zinnia.urls')),
   url(r'^comments/', include('django_comments.urls')),

@@ -1,29 +1,28 @@
 """Search module with complex query parsing for Zinnia"""
-from django.utils import six
 from django.db.models import Q
 
-from pyparsing import Word
-from pyparsing import alphas
-from pyparsing import WordEnd
+from pyparsing import CaselessLiteral
 from pyparsing import Combine
-from pyparsing import opAssoc
-from pyparsing import Optional
 from pyparsing import OneOrMore
+from pyparsing import Optional
+from pyparsing import ParseResults
 from pyparsing import StringEnd
+from pyparsing import Word
+from pyparsing import WordEnd
+from pyparsing import alphas
+from pyparsing import opAssoc
+from pyparsing import operatorPrecedence
 from pyparsing import printables
 from pyparsing import quotedString
 from pyparsing import removeQuotes
-from pyparsing import ParseResults
-from pyparsing import CaselessLiteral
-from pyparsing import operatorPrecedence
 
-from zinnia.models.entry import Entry
 from zinnia.models.author import Author
-from zinnia.settings import STOP_WORDS
+from zinnia.models.entry import Entry
 from zinnia.settings import SEARCH_FIELDS
+from zinnia.settings import STOP_WORDS
 
 
-def createQ(token):
+def create_q(token):
     """
     Creates the Q() object.
     """
@@ -31,7 +30,7 @@ def createQ(token):
     query = getattr(token, 'query', '')
     wildcards = None
 
-    if isinstance(query, six.string_types):  # Unicode -> Quoted string
+    if isinstance(query, str):  # Unicode -> Quoted string
         search = query
     else:  # List -> No quoted string (possible wildcards)
         if len(query) == 1:
@@ -87,7 +86,7 @@ def createQ(token):
         return Q(tags__icontains=search)
 
 
-def unionQ(token):
+def union_q(token):
     """
     Appends all the Q() objects.
     """
@@ -97,7 +96,7 @@ def unionQ(token):
 
     for t in token:
         if type(t) is ParseResults:  # See tokens recursively
-            query &= unionQ(t)
+            query &= union_q(t)
         else:
             if t in ('or', 'and'):  # Set the new op and go to next token
                 operation = t
@@ -125,16 +124,16 @@ OPER_NOT = '-'
 TERM = Combine(Optional(Word(alphas).setResultsName('meta') + ':') +
                (QUOTED.setResultsName('query') |
                 WILDCARDS.setResultsName('query')))
-TERM.setParseAction(createQ)
+TERM.setParseAction(create_q)
 
 EXPRESSION = operatorPrecedence(TERM, [
     (OPER_NOT, 1, opAssoc.RIGHT),
     (OPER_OR, 2, opAssoc.LEFT),
     (Optional(OPER_AND, default='and'), 2, opAssoc.LEFT)])
-EXPRESSION.setParseAction(unionQ)
+EXPRESSION.setParseAction(union_q)
 
 QUERY = OneOrMore(EXPRESSION) + StringEnd()
-QUERY.setParseAction(unionQ)
+QUERY.setParseAction(union_q)
 
 
 def advanced_search(pattern):

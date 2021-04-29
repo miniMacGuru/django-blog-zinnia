@@ -3,11 +3,11 @@ from django.conf.urls import url
 
 from zinnia.urls import _
 from zinnia.views.archives import EntryDay
-from zinnia.views.archives import EntryWeek
-from zinnia.views.archives import EntryYear
+from zinnia.views.archives import EntryIndex
 from zinnia.views.archives import EntryMonth
 from zinnia.views.archives import EntryToday
-from zinnia.views.archives import EntryIndex
+from zinnia.views.archives import EntryWeek
+from zinnia.views.archives import EntryYear
 
 
 index_patterns = [
@@ -51,7 +51,7 @@ day_patterns = [
         EntryDay.as_view(),
         name='entry_archive_day'),
     url(_(r'^(?P<year>\d{4})/(?P<month>\d{2})/'
-          '(?P<day>\d{2})/page/(?P<page>\d+)/$'),
+          r'(?P<day>\d{2})/page/(?P<page>\d+)/$'),
         EntryDay.as_view(),
         name='entry_archive_day_paginated'),
 ]

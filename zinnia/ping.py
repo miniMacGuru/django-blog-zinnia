@@ -1,22 +1,16 @@
 """Pings utilities for Zinnia"""
 import socket
-import threading
 from logging import getLogger
-try:
-    from urllib.request import urlopen
-    from urllib.parse import urlsplit
-    from xmlrpc.client import Error
-    from xmlrpc.client import ServerProxy
-except ImportError:  # Python 2
-    from urllib2 import urlopen
-    from urlparse import urlsplit
-    from xmlrpclib import Error
-    from xmlrpclib import ServerProxy
+from threading import Thread
+from urllib.parse import urlsplit
+from urllib.request import urlopen
+from xmlrpc.client import Error
+from xmlrpc.client import ServerProxy
 
 from bs4 import BeautifulSoup
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from zinnia.flags import PINGBACK
 from zinnia.settings import PROTOCOL
@@ -36,12 +30,12 @@ class URLRessources(object):
                                    reverse('zinnia:entry_feed'))
 
 
-class DirectoryPinger(threading.Thread):
+class DirectoryPinger(Thread):
     """
     Threaded web directory pinger.
     """
 
-    def __init__(self, server_name, entries, timeout=10, start_now=True):
+    def __init__(self, server_name, entries, timeout=10):
         self.results = []
         self.timeout = timeout
         self.entries = entries
@@ -49,9 +43,8 @@ class DirectoryPinger(threading.Thread):
         self.server = ServerProxy(self.server_name)
         self.ressources = URLRessources()
 
-        threading.Thread.__init__(self)
-        if start_now:
-            self.start()
+        super(DirectoryPinger, self).__init__()
+        self.start()
 
     def run(self):
         """
@@ -62,7 +55,7 @@ class DirectoryPinger(threading.Thread):
         for entry in self.entries:
             reply = self.ping_entry(entry)
             self.results.append(reply)
-            logger.info('%s : %s' % (self.server_name, reply['message']))
+            logger.info('%s : %s', self.server_name, reply['message'])
         socket.setdefaulttimeout(None)
 
     def ping_entry(self, entry):
@@ -91,12 +84,12 @@ class DirectoryPinger(threading.Thread):
         return reply
 
 
-class ExternalUrlsPinger(threading.Thread):
+class ExternalUrlsPinger(Thread):
     """
     Threaded external URLs pinger.
     """
 
-    def __init__(self, entry, timeout=10, start_now=True):
+    def __init__(self, entry, timeout=10):
         self.results = []
         self.entry = entry
         self.timeout = timeout
@@ -104,9 +97,8 @@ class ExternalUrlsPinger(threading.Thread):
         self.entry_url = '%s%s' % (self.ressources.site_url,
                                    self.entry.get_absolute_url())
 
-        threading.Thread.__init__(self)
-        if start_now:
-            self.start()
+        super(ExternalUrlsPinger, self).__init__()
+        self.start()
 
     def run(self):
         """
@@ -121,7 +113,7 @@ class ExternalUrlsPinger(threading.Thread):
         for url, server_name in external_urls_pingable.items():
             reply = self.pingback_url(server_name, url)
             self.results.append(reply)
-            logger.info('%s : %s' % (url, reply))
+            logger.info('%s : %s', url, reply)
 
         socket.setdefaulttimeout(None)
 

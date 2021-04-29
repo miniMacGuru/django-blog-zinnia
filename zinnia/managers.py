@@ -1,7 +1,7 @@
 """Managers of Zinnia"""
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
-from django.contrib.sites.models import Site
 
 from zinnia.settings import SEARCH_FIELDS
 
@@ -60,7 +60,7 @@ class EntryPublishedManager(models.Manager):
         """
         try:
             return self.advanced_search(pattern)
-        except:
+        except Exception:
             return self.basic_search(pattern)
 
     def advanced_search(self, pattern):

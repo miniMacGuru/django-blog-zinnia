@@ -1,20 +1,17 @@
 """Preview for Zinnia"""
 from __future__ import division
 
-from django.utils import six
-from django.utils.text import Truncator
-from django.utils.html import strip_tags
-from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible
-
 from bs4 import BeautifulSoup
 
-from zinnia.settings import PREVIEW_SPLITTERS
+from django.utils.functional import cached_property
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
+
 from zinnia.settings import PREVIEW_MAX_WORDS
 from zinnia.settings import PREVIEW_MORE_STRING
+from zinnia.settings import PREVIEW_SPLITTERS
 
 
-@python_2_unicode_compatible
 class HTMLPreview(object):
     """
     Build an HTML preview of an HTML content.
@@ -52,7 +49,7 @@ class HTMLPreview(object):
         """
         Method used to render the preview in templates.
         """
-        return six.text_type(self.preview)
+        return str(self.preview)
 
     def build_preview(self):
         """
