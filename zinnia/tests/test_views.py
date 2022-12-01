@@ -139,17 +139,14 @@ class ViewsTestCase(ViewsBaseCase):
 
     @override_settings(USE_TZ=False)
     def test_zinnia_entry_archive_index_no_timezone(self):
-        template_name_today = 'zinnia/archives/%s/entry_archive.html' % \
-                              date.today().strftime('%Y/%m/%d')
-        response = self.check_publishing_context(
-            '/', 2, 3, 'entry_list', 2)
+        template_name_today = f"zinnia/archives/{date.today():%Y/%m/%d}/entry_archive.html"
+
+        response = self.check_publishing_context('/', 2, 3, 'entry_list', 2)
         self.assertTemplateUsed(response, template_name_today)
 
     @override_settings(USE_TZ=True, TIME_ZONE='Europe/Paris')
     def test_zinnia_entry_archive_index_with_timezone(self):
-        template_name_today = 'zinnia/archives/%s/entry_archive.html' % \
-                              timezone.localtime(timezone.now()
-                                                 ).strftime('%Y/%m/%d')
+        template_name_today = f'zinnia/archives/{timezone.localtime(timezone.now()):%Y/%m/%d}/entry_archive.html'
         response = self.check_publishing_context(
             '/', 2, 3, 'entry_list', 2)
         self.assertTemplateUsed(response, template_name_today)
