@@ -40,7 +40,7 @@ class UsernamePathConverter:
     """
     Pattern converter for Author username string
     """
-    regex = r'[a-zA-Z0-9_.+-@]+'
+    regex = r'[.+-@\w]+'
 
     def to_python(self, value):
         return value
