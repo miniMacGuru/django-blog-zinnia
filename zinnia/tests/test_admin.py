@@ -191,14 +191,13 @@ class EntryAdminTestCase(BaseAdminTestCase):
     def test_get_short_url(self):
         with self.settings(ROOT_URLCONF=self.poor_urls):
             entry_url = self.entry.get_absolute_url()
-
+        hash_ = base36(self.entry.pk)
         self.check_with_rich_and_poor_urls(
-            self.admin.get_short_url, (self.entry,),
-            '<a href="http://example.com/%(hash)s/" target="blank">'
-            'http://example.com/%(hash)s/</a>' % {
-                'hash': base36(self.entry.pk)},
-            '<a href="%(url)s" target="blank">%(url)s</a>' % {
-                'url': entry_url})
+            self.admin.get_short_url,
+            (self.entry,),
+            f'<a href="http://example.com/{hash_}" target="blank">http://example.com/{hash_}</a>',
+            f'<a href="{entry_url}" target="blank">{entry_url}</a>'
+        )
 
     def test_get_is_visible(self):
         self.assertEqual(self.admin.get_is_visible(self.entry),

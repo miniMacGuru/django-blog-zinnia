@@ -712,9 +712,13 @@ class ViewsTestCase(ViewsBaseCase):
 
         comment = comments.get_model().objects.create(
             submit_date=timezone.now(),
-            comment='My Comment 1', content_object=self.category,
-            site=self.site, is_public=False)
-        success_url = '/comments/success/?c=%s' % comment.pk
+            comment='My Comment 1',
+            content_object=self.category,
+            site=self.site,
+            is_public=False
+        )
+
+        success_url = f'/comments/success/?c={comment.pk}'
         with self.assertNumQueries(1):
             response = self.client.get(success_url)
         self.assertEqual(response.context['comment'], comment)
