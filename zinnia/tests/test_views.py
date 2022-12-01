@@ -183,7 +183,7 @@ class ViewsTestCase(ViewsBaseCase):
         response = self.check_publishing_context(
             '/2010/week/00/', 1, 2, 'entry_list', 3)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/week/00/entry_archive_week.html')
+            response, 'zinnia/archives/2010/week/0/entry_archive_week.html')
         # All days in a new year preceding the first Monday
         # are considered to be in week 0.
         self.assertEqual(response.context['week'], date(2009, 12, 28))
@@ -202,9 +202,9 @@ class ViewsTestCase(ViewsBaseCase):
     @override_settings(USE_TZ=True, TIME_ZONE='Europe/Paris')
     def test_zinnia_entry_archive_week_with_timezone(self):
         response = self.check_publishing_context(
-            '/2010/week/00/', 1, 2, 'entry_list', 3)
+            '/2010/week/0/', 1, 2, 'entry_list', 3)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/week/00/entry_archive_week.html')
+            response, 'zinnia/archives/2010/week/0/entry_archive_week.html')
         # All days in a new year preceding the first Monday
         # are considered to be in week 0.
         self.assertEqual(response.context['week'], date(2009, 12, 28))
@@ -225,15 +225,15 @@ class ViewsTestCase(ViewsBaseCase):
         response = self.check_publishing_context(
             '/2010/01/', 1, 2, 'entry_list', 3)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/month/01/entry_archive_month.html')
-        self.assertEqual(response.context['previous_month'], None)
-        self.assertEqual(response.context['next_month'], date(2010, 5, 1))
-        self.assertEqual(list(response.context['date_list']),
+            response, 'zinnia/archives/2010/month/1/entry_archive_month.html')
+        self.assertEqual(response.context_data['previous_month'], None)
+        self.assertEqual(response.context_data['next_month'], date(2010, 5, 1))
+        self.assertEqual(list(response.context_data['date_list']),
                          [datetime(2010, 1, 1)])
         response = self.client.get('/2010/05/')
-        self.assertEqual(response.context['previous_month'], date(2010, 1, 1))
-        self.assertEqual(response.context['next_month'], None)
-        self.assertEqual(list(response.context['date_list']),
+        self.assertEqual(response.context_data['previous_month'], date(2010, 1, 1))
+        self.assertEqual(response.context_data['next_month'], None)
+        self.assertEqual(list(response.context_data['date_list']),
                          [datetime(2010, 5, 31)])
 
     @override_settings(USE_TZ=True, TIME_ZONE='Europe/Paris')
@@ -241,7 +241,7 @@ class ViewsTestCase(ViewsBaseCase):
         response = self.check_publishing_context(
             '/2010/01/', 1, 2, 'entry_list', 3)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/month/01/entry_archive_month.html')
+            response, 'zinnia/archives/2010/month/1/entry_archive_month.html')
         self.assertEqual(response.context['previous_month'], None)
         self.assertEqual(response.context['next_month'], date(2010, 6, 1))
         self.assertEqual(response.context['date_list'][0].date(),
@@ -257,23 +257,23 @@ class ViewsTestCase(ViewsBaseCase):
         response = self.check_publishing_context(
             '/2010/01/01/', 1, 2, 'entry_list', 2)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/01/01/entry_archive_day.html')
-        self.assertEqual(response.context['previous_month'], None)
-        self.assertEqual(response.context['next_month'], date(2010, 5, 1))
-        self.assertEqual(response.context['previous_day'], None)
-        self.assertEqual(response.context['next_day'], date(2010, 5, 31))
+            response, 'zinnia/archives/2010/1/1/entry_archive_day.html')
+        self.assertEqual(response.context_data['previous_month'], None)
+        self.assertEqual(response.context_data['next_month'], date(2010, 5, 1))
+        self.assertEqual(response.context_data['previous_day'], None)
+        self.assertEqual(response.context_data['next_day'], date(2010, 5, 31))
         response = self.client.get('/2010/05/31/')
-        self.assertEqual(response.context['previous_month'], date(2010, 1, 1))
-        self.assertEqual(response.context['next_month'], None)
-        self.assertEqual(response.context['previous_day'], date(2010, 1, 1))
-        self.assertEqual(response.context['next_day'], None)
+        self.assertEqual(response.context_data['previous_month'], date(2010, 1, 1))
+        self.assertEqual(response.context_data['next_month'], None)
+        self.assertEqual(response.context_data['previous_day'], date(2010, 1, 1))
+        self.assertEqual(response.context_data['next_day'], None)
 
     @override_settings(USE_TZ=True, TIME_ZONE='Europe/Paris')
     def test_zinnia_entry_archive_day_with_timezone(self):
         response = self.check_publishing_context(
             '/2010/01/02/', 1, 2, 'entry_list', 2)
         self.assertTemplateUsed(
-            response, 'zinnia/archives/2010/01/02/entry_archive_day.html')
+            response, 'zinnia/archives/2010/1/2/entry_archive_day.html')
         self.assertEqual(response.context['previous_month'], None)
         self.assertEqual(response.context['next_month'], date(2010, 6, 1))
         self.assertEqual(response.context['previous_day'], None)
@@ -314,7 +314,7 @@ class ViewsTestCase(ViewsBaseCase):
 
     def test_zinnia_entry_shortlink(self):
         with self.assertNumQueries(1):
-            response = self.client.get('/%s/' % base36(self.first_entry.pk))
+            response = self.client.get(f'/{base36(self.first_entry.pk)}/')
         self.assertEqual(response.status_code, 301)
         self.assertEqual(
             response['Location'],
@@ -326,7 +326,7 @@ class ViewsTestCase(ViewsBaseCase):
         """
         self.first_entry.sites.clear()
         with self.assertNumQueries(1):
-            response = self.client.get('/%s/' % base36(self.first_entry.pk))
+            response = self.client.get(f'/{base36(self.first_entry.pk)}/')
         self.assertEqual(response.status_code, 404)
 
     def test_zinnia_entry_detail(self):
@@ -371,7 +371,7 @@ class ViewsTestCase(ViewsBaseCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response,
-            'zinnia/archives/2010/01/01/my-test-entry_entry_custom.html')
+            'zinnia/archives/2010/1/1/my-test-entry_entry_custom.html')
 
     @override_settings(USE_TZ=True, TIME_ZONE='Europe/Paris')
     def test_zinnia_entry_detail_with_timezone(self):
@@ -383,7 +383,7 @@ class ViewsTestCase(ViewsBaseCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response,
-            'zinnia/archives/2010/01/02/my-test-entry_entry_custom.html')
+            'zinnia/archives/2010/1/2/my-test-entry_entry_custom.html')
 
     @override_settings(USE_TZ=False)
     def test_zinnia_entry_detail_login(self):
@@ -400,7 +400,7 @@ class ViewsTestCase(ViewsBaseCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response,
-            'zinnia/archives/2010/01/01/my-test-entry_entry_detail.html')
+            'zinnia/archives/2010/1/1/my-test-entry_entry_detail.html')
 
     @override_settings(USE_TZ=False)
     def test_zinnia_entry_detail_password(self):
@@ -422,7 +422,7 @@ class ViewsTestCase(ViewsBaseCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response,
-            'zinnia/archives/2010/01/01/my-test-entry_entry_detail.html')
+            'zinnia/archives/2010/1/1/my-test-entry_entry_detail.html')
 
     @override_settings(USE_TZ=False)
     def test_zinnia_entry_detail_login_password(self):
@@ -447,7 +447,7 @@ class ViewsTestCase(ViewsBaseCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response,
-            'zinnia/archives/2010/01/01/my-test-entry_entry_detail.html')
+            'zinnia/archives/2010/1/1/my-test-entry_entry_detail.html')
         user_logged_in.connect(update_last_login)
 
     def test_zinnia_entry_detail_preview(self):
