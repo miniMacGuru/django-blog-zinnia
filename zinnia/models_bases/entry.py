@@ -92,12 +92,7 @@ class CoreEntry(models.Model):
         Checks if an entry is within his publication period.
         """
         now = timezone.now()
-        if self.start_publication and now < self.start_publication:
-            return False
-
-        if self.end_publication and now >= self.end_publication:
-            return False
-        return True
+        return (self.start_publication or now) <= now <= (self.end_publication or now)
 
     @property
     def is_visible(self):
