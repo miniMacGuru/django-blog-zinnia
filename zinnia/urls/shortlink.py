@@ -5,7 +5,7 @@ from zinnia.views.shortlink import EntryShortLink
 
 
 urlpatterns = [
-    path('<token:token>',
+    path('<token:token>/',
          EntryShortLink.as_view(),
          name='entry_shortlink'),
 ]

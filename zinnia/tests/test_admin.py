@@ -195,7 +195,7 @@ class EntryAdminTestCase(BaseAdminTestCase):
         self.check_with_rich_and_poor_urls(
             self.admin.get_short_url,
             (self.entry,),
-            f'<a href="http://example.com/{hash_}" target="blank">http://example.com/{hash_}</a>',
+            f'<a href="http://example.com/{hash_}/" target="blank">http://example.com/{hash_}/</a>',
             f'<a href="{entry_url}" target="blank">{entry_url}</a>'
         )
 
