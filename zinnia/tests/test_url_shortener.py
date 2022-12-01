@@ -58,11 +58,11 @@ class UrlShortenerDefaultBackendTestCase(TestCase):
         default.PROTOCOL = 'http'
         entry = FakeEntry(1)
         self.assertEqual(default.backend(entry),
-                         'http://example.com/1/')
+                         'http://example.com/1')
         default.PROTOCOL = 'https'
         entry = FakeEntry(100)
         self.assertEqual(default.backend(entry),
-                         'https://example.com/2S/')
+                         'https://example.com/2S')
         default.PROTOCOL = original_protocol
 
     def test_base36(self):
