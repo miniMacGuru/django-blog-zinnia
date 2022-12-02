@@ -1,14 +1,12 @@
 ==================
-Django Blog Xinnia
+Django Blog Zinnia
 ==================
 
 .. Note::
-    This is a fork of
+    This is a Housekeep merge of
     `django-blog-zinnia <https://github.com/Fantomas42/django-blog-zinnia>`_
-    to include fixes for last Django since original project is abandonned.
-
-    Code is almost unchanged except for needed fixes and even package has renamed
-    "zinnia" to "xinnia", its module has keeped the old name.
+    and `django-blog-xinnia <https://github.com/emencia/django-blog-xinnia>`_
+    to include Django 3 compatibility introduced in Xinnia since the original project is abandoned.
 
 Simple yet powerful and really extendable application for managing a blog
 within your Django Web site.

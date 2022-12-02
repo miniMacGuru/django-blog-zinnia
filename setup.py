@@ -1,11 +1,11 @@
-"""Setup script of django-blog-xinnia"""
+"""Setup script of django-blog-zinnia"""
 from setuptools import find_packages
 from setuptools import setup
 
 import zinnia
 
 setup(
-    name='django-blog-xinnia',
+    name='django-blog-zinnia',
     version=zinnia.__version__,
 
     description='A clear and powerful weblog application powered with Django',

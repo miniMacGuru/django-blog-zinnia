@@ -17,4 +17,4 @@ develop-eggs
 django-apps-src
 docs/build
 demo/demo.db*
-django_blog_xinnia.egg-info/
+django_blog_zinnia.egg-info/
