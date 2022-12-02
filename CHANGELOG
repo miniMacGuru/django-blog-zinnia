@@ -1,3 +1,11 @@
+0.22.0-hk - 2022/12/02
+
+* Fix backwards incompatible shortened URLs to include trailing slash
+* Fix unicode compatibility for author names
+* Fix week 0 bug where the wrong template would be used for week 0 as it is falsy
+* Re-instate Django 2.2 compatibility
+* General test updating
+
 0.21.3 - 2021/02/25
 -------------------
 
