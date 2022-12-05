@@ -29,9 +29,7 @@ COMMENT_WP_COUNT_COMMENTS = 'zinnia.comment.was_posted.count_comments'
 PINGBACK_WF_COUNT_PINGBACKS = 'zinnia.pingback.was_flagged.count_pingbacks'
 TRACKBACK_WF_COUNT_TRACKBACKS = 'zinnia.trackback.was_flagged.count_trackbacks'
 
-# providing_args=['pingback', 'entry']
 pingback_was_posted = Signal()
-# providing_args=['trackback', 'entry']
 trackback_was_posted = Signal()
 
 
