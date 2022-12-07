@@ -2,19 +2,20 @@
 from django.conf.urls import include
 from django.conf.urls import url
 from django.contrib import admin
+from django.urls import path
 
 from zinnia.views.entries import EntryDetail
 
 admin.autodiscover()
 
 blog_urls = ([
-    url(r'^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<slug>[-\w]+)/$',
+    path('<yyyy:year>/<mm:month>/<dd:day>/<slug:slug>/',
         EntryDetail.as_view(),
         name='entry_detail')],
     'zinnia'
 )
 
 urlpatterns = [
-    url(r'^', include(blog_urls)),
-    url(r'^admin/', admin.site.urls),
+    path('', include(blog_urls)),
+    path('admin/', admin.site.urls),
 ]

@@ -1,5 +1,5 @@
 """Urls for the Zinnia archives"""
-from django.conf.urls import url
+from django.urls import path
 
 from zinnia.urls import _
 from zinnia.views.archives import EntryDay
@@ -11,58 +11,58 @@ from zinnia.views.archives import EntryYear
 
 
 index_patterns = [
-    url(r'^$',
-        EntryIndex.as_view(),
-        name='entry_archive_index'),
-    url(_(r'^page/(?P<page>\d+)/$'),
-        EntryIndex.as_view(),
-        name='entry_archive_index_paginated')
+    path('',
+         EntryIndex.as_view(),
+         name='entry_archive_index'),
+    path(_('page/<int:page>/'),
+         EntryIndex.as_view(),
+         name='entry_archive_index_paginated')
 ]
 
 year_patterns = [
-    url(r'^(?P<year>\d{4})/$',
-        EntryYear.as_view(),
-        name='entry_archive_year'),
-    url(_(r'^(?P<year>\d{4})/page/(?P<page>\d+)/$'),
-        EntryYear.as_view(),
-        name='entry_archive_year_paginated'),
+    path('<yyyy:year>/',
+         EntryYear.as_view(),
+         name='entry_archive_year'),
+    path(_('<yyyy:year>/page/<int:page>/'),
+         EntryYear.as_view(),
+         name='entry_archive_year_paginated'),
 ]
 
 week_patterns = [
-    url(_(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$'),
-        EntryWeek.as_view(),
-        name='entry_archive_week'),
-    url(_(r'^(?P<year>\d{4})/week/(?P<week>\d+)/page/(?P<page>\d+)/$'),
-        EntryWeek.as_view(),
-        name='entry_archive_week_paginated'),
+    path(_('<yyyy:year>/week/<int:week>/'),
+         EntryWeek.as_view(),
+         name='entry_archive_week'),
+    path(_('<yyyy:year>/week/<int:week>/page/<int:page>/'),
+         EntryWeek.as_view(),
+         name='entry_archive_week_paginated'),
 ]
 
 month_patterns = [
-    url(r'^(?P<year>\d{4})/(?P<month>\d{2})/$',
-        EntryMonth.as_view(),
-        name='entry_archive_month'),
-    url(_(r'^(?P<year>\d{4})/(?P<month>\d{2})/page/(?P<page>\d+)/$'),
-        EntryMonth.as_view(),
-        name='entry_archive_month_paginated'),
+    path('<yyyy:year>/<mm:month>/',
+         EntryMonth.as_view(),
+         name='entry_archive_month'),
+    path(_('<yyyy:year>/<mm:month>/page/<int:page>/'),
+         EntryMonth.as_view(),
+         name='entry_archive_month_paginated'),
 ]
 
 day_patterns = [
-    url(r'^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$',
-        EntryDay.as_view(),
-        name='entry_archive_day'),
-    url(_(r'^(?P<year>\d{4})/(?P<month>\d{2})/'
-          r'(?P<day>\d{2})/page/(?P<page>\d+)/$'),
-        EntryDay.as_view(),
-        name='entry_archive_day_paginated'),
+    path('<yyyy:year>/<mm:month>/<dd:day>/',
+         EntryDay.as_view(),
+         name='entry_archive_day'),
+    path(_('<yyyy:year>/<mm:month>/'
+           '<dd:day>/page/<int:page>/'),
+         EntryDay.as_view(),
+         name='entry_archive_day_paginated'),
 ]
 
 today_patterns = [
-    url(_(r'^today/$'),
-        EntryToday.as_view(),
-        name='entry_archive_today'),
-    url(_(r'^today/page/(?P<page>\d+)/$'),
-        EntryToday.as_view(),
-        name='entry_archive_today_paginated'),
+    path(_('today/'),
+         EntryToday.as_view(),
+         name='entry_archive_today'),
+    path(_('today/page/<int:page>/'),
+         EntryToday.as_view(),
+         name='entry_archive_today_paginated'),
 ]
 
 archive_patterns = (index_patterns + year_patterns +

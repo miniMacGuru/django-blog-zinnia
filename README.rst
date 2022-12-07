@@ -1,8 +1,12 @@
-===================================
-Django Blog Zinnia |latest-version|
-===================================
+==================
+Django Blog Zinnia
+==================
 
-|travis-develop| |coverage-develop|
+.. Note::
+    This is a Housekeep merge of
+    `django-blog-zinnia <https://github.com/Fantomas42/django-blog-zinnia>`_
+    and `django-blog-xinnia <https://github.com/emencia/django-blog-xinnia>`_
+    to include Django 3 compatibility introduced in Xinnia since the original project is abandoned.
 
 Simple yet powerful and really extendable application for managing a blog
 within your Django Web site.
@@ -13,8 +17,6 @@ Basically any feature that can be provided by another reusable app has been
 left out.
 Why should we re-implement something that is already done and reviewed by
 others and tested?
-
-|paypal|
 
 Features
 ========
@@ -83,18 +85,6 @@ More information and help available at these URLs:
 * Discussions and help at `Google Group`_
 * For reporting a bug use `GitHub Issues`_
 
-.. |travis-develop| image:: https://img.shields.io/travis/Fantomas42/django-blog-zinnia/develop.svg
-   :alt: Build Status - develop branch
-   :target: http://travis-ci.org/Fantomas42/django-blog-zinnia
-.. |coverage-develop| image:: https://img.shields.io/coveralls/Fantomas42/django-blog-zinnia/develop.svg
-   :alt: Coverage of the code
-   :target: https://coveralls.io/r/Fantomas42/django-blog-zinnia
-.. |latest-version| image:: https://img.shields.io/pypi/v/django-blog-zinnia.svg
-   :alt: Latest version on Pypi
-   :target: https://pypi.python.org/pypi/django-blog-zinnia/
-.. |paypal| image:: https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif
-   :alt:  Make a free donation with Paypal to encourage the development
-   :target: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=68T48HR8KK9KG
 .. _`Sitemaps`: http://docs.django-blog-zinnia.com/en/latest/getting-started/configuration.html#module-zinnia.sitemaps
 .. _`Advanced search engine`: http://docs.django-blog-zinnia.com/en/latest/topics/search_engines.html
 .. _`Custom templates for various contents`: http://docs.django-blog-zinnia.com/en/latest/getting-started/configuration.html#templates-for-entries

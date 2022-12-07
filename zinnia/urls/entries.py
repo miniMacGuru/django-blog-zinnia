@@ -1,11 +1,11 @@
 """Urls for the Zinnia entries"""
-from django.conf.urls import url
+from django.urls import path
 
 from zinnia.views.entries import EntryDetail
 
 
 urlpatterns = [
-    url(r'^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<slug>[-\w]+)/$',
+    path('<yyyy:year>/<mm:month>/<dd:day>/<slug:slug>/',
         EntryDetail.as_view(),
         name='entry_detail'),
 ]

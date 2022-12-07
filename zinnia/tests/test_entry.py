@@ -158,18 +158,22 @@ class EntryTestCase(TestCase):
 
     def test_is_actual(self):
         self.assertTrue(self.entry.is_actual)
-        self.entry.start_publication = datetime(2020, 3, 15)
+        self.entry.start_publication = datetime(3020, 3, 15)
         self.assertFalse(self.entry.is_actual)
         self.entry.start_publication = timezone.now()
         self.assertTrue(self.entry.is_actual)
         self.entry.end_publication = datetime(2000, 3, 15)
         self.assertFalse(self.entry.is_actual)
+        self.entry.end_publication = timezone.now() + timedelta(days=1)
+        self.assertTrue(self.entry.is_actual)
+        self.entry.start_publication = None
+        self.assertTrue(self.entry.is_actual)
 
     def test_is_visible(self):
         self.assertFalse(self.entry.is_visible)
         self.entry.status = PUBLISHED
         self.assertTrue(self.entry.is_visible)
-        self.entry.start_publication = datetime(2020, 3, 15)
+        self.entry.start_publication = datetime(3020, 3, 15)
         self.assertFalse(self.entry.is_visible)
 
     def test_short_url(self):
