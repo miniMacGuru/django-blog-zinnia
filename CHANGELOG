@@ -1,4 +1,4 @@
-0.22.0-hk - 2022/12/02
+0.22.rc1 - 2022/12/02
 
 * Fix backwards incompatible shortened URLs to include trailing slash
 * Fix unicode compatibility for author names
